@@ -8,3 +8,5 @@
 *.ilk
 /Debug
 /Release
+/.vs/v6a/v17/Browse.VC.opendb
+/.vs
