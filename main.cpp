@@ -1,6 +1,8 @@
 #include "main.h"
 #include "rc.h"
 
+COLORREF custom_colors[16] = { 0 };
+
 int size_dialog::idd() const {
 	return IDD_SIZE; 
 }
@@ -20,6 +22,18 @@ bool size_dialog::on_ok(){
 		return false;
 	}
 	return true;
+}
+COLORREF get_color(HWND parent, COLORREF color) {
+	CHOOSECOLOR cc;
+	ZeroMemory(&cc, sizeof cc);
+	cc.lStructSize = sizeof cc;
+	cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+	cc.hwndOwner = parent;
+	cc.lpCustColors = custom_colors;
+	cc.rgbResult = color;
+	if (ChooseColor(&cc))
+		color = cc.rgbResult;
+	return color;
 }
 
 
@@ -52,27 +66,14 @@ void main_window::on_command(int id){
 			if (size_dlg.do_modal(0, *this) == IDOK) {
 				x = size_dlg.x_dialog;
 				y = size_dlg.y_dialog;
-				InvalidateRect(*this, NULL, true);
+				InvalidateRect(*this, nullptr, true);
 			}
 
 			break;
 		}
 		case ID_COLOR: {
-			COLORREF custom_colors[16] = {0};
-			CHOOSECOLOR cc;
-
-			ZeroMemory(&cc, sizeof cc);
-			cc.lStructSize = sizeof cc;
-			cc.Flags = CC_RGBINIT | CC_FULLOPEN;
-			cc.lpCustColors = custom_colors;
-			cc.hwndOwner = *this;
-			cc.rgbResult = my_color;
-
-			if (ChooseColor(&cc)) {
-				my_color = cc.rgbResult;
-				InvalidateRect(*this, NULL, true);
-			}
-
+			my_color = get_color(*this, my_color);
+			InvalidateRect(*this, nullptr, true);
 			break;
 		}
 		case ID_EXIT: 
